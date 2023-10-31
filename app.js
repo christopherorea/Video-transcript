@@ -55,7 +55,7 @@ const url = process.argv[2];
   //await page.screenshot({ path: 'show_transcript.png' });
 
   // Create a file
-  writeFile('output.txt', content.toString().replace(/,?[0-9]+:[0-9][0-9]/g, "").replace(/^\s*\n/gm, ""), (err) => {
+  writeFile('output.txt', url + "\n\n" + content.toString().replace(/,?[0-9]+:[0-9][0-9]/g, "").replace(/^\s*\n/gm, ""), (err) => {
     if (err) throw err;
   });
 
