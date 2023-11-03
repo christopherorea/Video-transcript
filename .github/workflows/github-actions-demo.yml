@@ -10,9 +10,13 @@ jobs:
           node-version: "16.x"
       - name: Instala chrome
         run: npx @puppeteer/browsers install chrome@stable
-      - name: Corre node
+      - name: Instala Puppeteer
         run: | 
-          npm install --ignore-scripts puppeteer &&
+          npm install --ignore-scripts puppeteer
+      - name: Obtiene repo
+        use: actions/checkout@v4
+      - name: Corre app
+        run: | 
           node app.js ${{ github.event.head_commit.message }}
       - name: Muestra Output
         run: cat output.txt
