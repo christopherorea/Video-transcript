@@ -10,6 +10,7 @@ jobs:
           node-version: "16.x"
       - name: Instala chrome
         run: npx @puppeteer/browsers install chrome@stable
+      - name: Guarda Chrome
         uses: actions/download-artifact@v3
         with:
           name: Guarda Chrome
