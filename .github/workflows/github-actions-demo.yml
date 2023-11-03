@@ -21,7 +21,10 @@ jobs:
           node app.js $video
       - name: Muestra Output
         if: success()
-        run: cat output.txt
+        run: |
+        for i in $video
+        do cat $i
+        done
       - name: Guarda Output
         if: success()
         run: |
