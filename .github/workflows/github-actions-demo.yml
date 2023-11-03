@@ -17,7 +17,8 @@ jobs:
       - name: Corre app
         if: success()
         run: | 
-          node app.js ${{ github.event.head_commit.message }}
+          video = $(cat video.txt)
+          node app.js $video
       - name: Muestra Output
         if: success()
         run: cat output.txt
