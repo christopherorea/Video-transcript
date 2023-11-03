@@ -1,7 +1,7 @@
 name: Run and get videos
 on: [push]
 jobs:
-  Run node:
+  - name: Correr Node
     runs-on: ubuntu-latest
     steps:
       - name: Instala node
