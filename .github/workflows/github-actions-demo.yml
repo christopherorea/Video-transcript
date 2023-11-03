@@ -13,7 +13,7 @@ jobs:
         run: npx @puppeteer/browsers install chrome@stable
       - name: Instala Puppeteer
         run: | 
-          npm install --ignore-scripts puppeteer
+          npm install --ignore-scripts
       - name: Corre app
         if: success()
         run: | 
