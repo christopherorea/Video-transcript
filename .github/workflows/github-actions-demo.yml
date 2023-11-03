@@ -29,4 +29,4 @@ jobs:
           git config --global user.email 'c28_09_98@hotmail.com'
           git checkout -b "output"
           git commit -am "Nuevo Output"
-          git push --set-upstream origin output
+          git push --force --set-upstream origin output
