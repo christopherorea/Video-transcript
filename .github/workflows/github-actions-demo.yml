@@ -11,7 +11,7 @@ jobs:
           node-version: "16.x"
       - name: Instala chrome
         run: npx @puppeteer/browsers install chrome@stable
-      - name: Instala Puppeteer
+      - name: Instala paquetería
         run: | 
           npm install --ignore-scripts
       - name: Corre app

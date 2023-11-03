@@ -3,7 +3,7 @@ import { writeFile } from "fs";
 import { eachLine } from 'line-reader';
 
 
-eachLine('output.txt', (url, last)=> {
+eachLine('video.txt', (url, _)=> {
   (async () => {
     // Launch the browser and open a new blank page
     const browser = await launch({ 
