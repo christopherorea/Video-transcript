@@ -56,7 +56,7 @@ eachLine('video.txt', (url, _)=> {
     //await page.screenshot({ path: 'show_transcript.png' });
   
     // Create a file
-    writeFile(`${url.split('/')[3]}.txt`, url + "\n\n" + content.toString().replace(/,?[0-9]+:[0-9][0-9]/g, "").replace(/^\s*\n/gm, ""), (err) => {
+    writeFile(`${url.split('=')[1]}.txt`, url + "\n\n" + content.toString().replace(/,?[0-9]+:[0-9][0-9]/g, "").replace(/^\s*\n/gm, ""), (err) => {
       if (err) throw err;
     });
   
