@@ -1,7 +1,7 @@
 name: Run and get videos
 on: [push]
 jobs:
-  run_node:
+  create_node:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

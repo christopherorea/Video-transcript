@@ -8,7 +8,7 @@ const url = process.argv[2];
   // Launch the browser and open a new blank page
   const browser = await launch({ 
     headless: true, 
-    executablePath: './chrome/linux-119.0.6045.105/chrome-linux64/chrome' 
+    executablePath: './chrome/win64-118.0.5993.70/chrome-win64/chrome.exe' 
   });
   const page = await browser.newPage();
 
@@ -25,13 +25,14 @@ const url = process.argv[2];
   await page.waitForSelector(options, { timeout: 10000 });
   await page.click(options);
 
-  // Opens transcript option
+  /* Opens transcript option
   //await page.screenshot({ path: 'check_for_transcript.png' })
   console.log('Opens transcript option');
   //await page.screenshot({ path: 'transcript_option.png' });
   const show = '#items > ytd-menu-service-item-renderer';
   await page.waitForSelector(show, { timeout: 10000 });
   await page.click(show);
+  */
 
   // Opens transcript text
   console.log('Activates transcript text');
