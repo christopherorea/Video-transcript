@@ -8,7 +8,7 @@ const url = process.argv[2];
   // Launch the browser and open a new blank page
   const browser = await launch({ 
     headless: true, 
-    executablePath: './chrome/win64-118.0.5993.70/chrome-win64/chrome.exe' 
+    executablePath: './chrome/linux-119.0.6045.105/chrome-linux64/chrome' 
   });
   const page = await browser.newPage();
 
