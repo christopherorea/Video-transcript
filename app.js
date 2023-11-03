@@ -8,7 +8,7 @@ const url = process.argv[2];
   // Launch the browser and open a new blank page
   const browser = await launch({ 
     headless: true, 
-    executablePath: 'C:/Users/c28_0/OneDrive/Documentos/Projects/KG-Neo4j/chrome/win64-118.0.5993.70/chrome-win64/chrome.exe' 
+    executablePath: './chrome/win64-118.0.5993.70/chrome-win64/chrome.exe' 
   });
   const page = await browser.newPage();
 

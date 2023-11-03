@@ -1,18 +1,24 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+name: Run and get videos
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  Run node:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Instala node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+      - name: Instala chrome
+        run: npx @puppeteer/browsers install chrome@stable
+        uses: actions/download-artifact@v3
+        with:
+          name: Guarda Chrome
+          path: chrome
+      - name: Corre node
+        run: | 
+          npm install --ignore-scripts puppeteer &&
+          node .\app.js ${{ github.event.head_commit.message }}
+      - name: Guarda Output
+        uses: stefanzweifel/git-auto-commit-action@v4
+
+             
