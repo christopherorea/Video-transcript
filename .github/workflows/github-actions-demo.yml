@@ -22,8 +22,7 @@ jobs:
       - name: Muestra Output
         if: success()
         run: |
-        cat $video | while read i
-        do cat $i done
+        $(cat $video | while read i do cat $i done)
       - name: Guarda Output
         if: success()
         run: |
