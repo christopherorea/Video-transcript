@@ -13,7 +13,7 @@ jobs:
       - name: Corre node
         run: | 
           npm install --ignore-scripts puppeteer &&
-          node .\app.js ${{ github.event.head_commit.message }}
+          node app.js ${{ github.event.head_commit.message }}
       - name: Guarda Output
         uses: stefanzweifel/git-auto-commit-action@v4
 
