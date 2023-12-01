@@ -1,89 +1,195 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+    <title>Firebase Stripe Example</title>
+</head>
+<body>
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/10.7.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/10.7.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/10.7.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/10.7.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/10.7.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/10.7.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/10.7.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/10.7.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/10.7.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/10.7.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+    <div style="margin: auto; max-width: 500px; padding: 20px; text-align: center;">
+        <form id="form">
+            <button id="checkout">Use Checkout</button>
+            <div id="payment-request-button">
+                <!-- Payment button gets injected here -->
+            </div>
+            <div>Pay with card</div>
+            <div id="card-element">
+                <!-- Stripe card inputs get injected here -->
+            </div>
+            <button type="submit">Donate $5 USD</button>
+            <div id="error" style="color: #e25950;"></div>
+        </form>
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+        <div id="processing" style="display: none;">processing...</div>
+        <div id="thanks" style="display: none;">Thanks for your donation!</div>
     </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+
+    <!-- This script used for the Payment Request and Card Element methods -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <!-- This script used for the Checkout method -->
+    <script src="https://checkout.stripe.com/checkout.js"></script>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        const STRIPE_PUBLIC_KEY = 'pk_test_51MbInTCGRIaxqe2Gnb0pYkCIHCg5eCzhmkpHPUqT8aYAaKVygHY7aemnrWh3vshlZ7EuBJfITcU0EDE0eMMP1nAu00zT6yDqug'; // TODO: PUT YOUR STRIPE PUBLISHABLE KEY HERE
+        const FIREBASE_FUNCTION = 'https://stripe-test-52ab7.cloudfunctions.net/charge/'; // TODO: PUT YOUR FIREBASE FUNCTIONS URL HERE
 
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+        const stripe = Stripe(STRIPE_PUBLIC_KEY);
+        const elements = stripe.elements();
+
+        const charge_amount = 500;
+        const charge_currency = 'usd';
+
+        // Store the elements used
+        const elForm = document.getElementById('form');
+        const elCheckout = document.getElementById('checkout');
+        const elPaymentButton = document.getElementById('payment-request-button');
+        const elCard = document.getElementById('card-element');
+        const elError = document.getElementById('error');
+        const elProcessing = document.getElementById('processing');
+        const elThanks = document.getElementById('thanks');
+
+        addPaymentRequestMethod();
+        addCardMethod();
+        addCheckoutMethod();
+
+        function addPaymentRequestMethod() {
+            const paymentRequest = stripe.paymentRequest({
+                country: 'US',
+                currency: charge_currency,
+                total: {
+                    label: 'Total',
+                    amount: charge_amount,
+                }
+            });
+
+            const paymentRequestButton = elements.create('paymentRequestButton', {
+                paymentRequest,
+                style: {
+                    paymentRequestButton: {
+                        type: 'donate'
+                    }
+                }
+            });
+
+            // Only mount button if browser supports payment requests
+            (async () => {
+                const result = await paymentRequest.canMakePayment();
+                if (result) paymentRequestButton.mount(elPaymentButton);
+                else elPaymentButton.style.display = 'none';
+            })();
+
+            paymentRequest.on('token', async result => {
+
+                // Pass the received token to our Firebase function
+                let res = await charge(result.token, charge_amount, charge_currency);
+                if (res.body.error) {
+                    result.complete('fail');
+                } else {
+
+                    // Card successfully charged
+                    result.complete('success');
+                    elForm.style.display = 'none';
+                    elThanks.style.display = 'block';
+                }
+            });
         }
-      });
+
+        function addCardMethod() {
+            const card = elements.create('card');
+            card.mount(elCard);
+
+            // Create flags to help prevent duplicate submissions
+            let isSubmitting, isSuccess;
+
+            // Handle validation errors from the card element
+            card.addEventListener('change', e => {
+                if (e.error) {
+                    elError.textContent = e.error.message;
+                } else {
+                    elError.textContent = '';
+                }
+            });
+
+            elForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                if (isSubmitting) return;
+                isSubmitting = true;
+
+                elForm.style.display = 'none';
+                elProcessing.style.display = 'block';
+
+                let result = await stripe.createToken(card);
+
+                // Error in receiving token
+                if (result.error) return elError.textContent = result.error.message;
+
+                // Pass the received token to our Firebase function
+                let res = await charge(result.token, charge_amount, charge_currency);
+                if (res.body.error) return elError.textContent = res.body.error;
+
+                // Card successfully charged
+                card.clear();
+                isSuccess = true;
+
+                isSubmitting = false;
+                elProcessing.style.display = 'none';
+
+                // Either display thanks or re-display form if there was an error
+                if (isSuccess) {
+                    elThanks.style.display = 'block';
+                } else {
+                    elForm.style.display = 'block';
+                }
+            });
+        }
+
+        function addCheckoutMethod() {
+            const handler = StripeCheckout.configure({
+                key: STRIPE_PUBLIC_KEY,
+                locale: 'auto',
+                token: async token => {
+
+                    // Pass the received token to our Firebase function
+                    let res = await charge(token, charge_amount, charge_currency);
+                    if (res.body.error) return elError.textContent = res.body.error;
+
+                    // Card successfully charged
+                    elForm.style.display = 'none';
+                    elThanks.style.display = 'block';
+                }
+            });
+
+            elCheckout.addEventListener('click', e => {
+                e.preventDefault();
+                handler.open({
+                    name: 'Firebase Example',
+                    amount: charge_amount,
+                    currency: charge_currency,
+                });
+            });
+
+            // Close Checkout on page navigation
+            window.addEventListener('popstate', () => handler.close());
+        }
+
+        // Function used by all three methods to send the charge data to your Firebase function
+        async function charge(token, amount, currency) {
+            const res = await fetch(FIREBASE_FUNCTION, {
+                method: 'POST',
+                body: JSON.stringify({
+                    token,
+                    charge: {
+                        amount,
+                        currency,
+                    },
+                }),
+            });
+            const data = await res.json();
+            data.body = JSON.parse(data.body);
+            return data;
+        }
     </script>
-  </body>
+
+</body>
 </html>
