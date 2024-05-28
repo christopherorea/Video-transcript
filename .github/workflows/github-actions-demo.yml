@@ -10,7 +10,7 @@ jobs:
         with:
           node-version: "16.x"
       - name: Instala chrome
-        run: npx @puppeteer/browsers install chrome@stable
+        run: npx @puppeteer/browsers install chrome@stable && sudo apt-get install chromium-browser
       - name: Instala paquetería
         run: | 
           npm install --ignore-scripts
