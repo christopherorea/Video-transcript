@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Transcript Downloader",
+  "version": "1.0",
+  "description": "Downloads transcripts from YouTube videos.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting" 
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
