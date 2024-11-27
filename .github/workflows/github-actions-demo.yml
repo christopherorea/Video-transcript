@@ -17,8 +17,7 @@ jobs:
       - name: Corre app
         if: success()
         run: | 
-          video=$(cat video.txt)
-          node app.js $video
+          node app.js
       - name: Guarda Output
         if: success()
         run: |

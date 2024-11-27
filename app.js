@@ -8,7 +8,7 @@ eachLine('video.txt', (url, _)=> {
     // Launch the browser and open a new blank page
     const browser = await launch({ 
       headless: true, 
-      executablePath: './chrome/linux-119.0.6045.105/chrome-linux64/chrome' 
+      executablePath: '/usr/bin/chromium-browser' 
     });
     const page = await browser.newPage();
   
