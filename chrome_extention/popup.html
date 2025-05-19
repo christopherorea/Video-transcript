@@ -2,10 +2,30 @@
 <html>
 <head>
   <title>YouTube Transcript Downloader</title>
+   <style>
+    body {
+      width: 400px;
+      padding: 10px;
+    }
+    #summary {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 10px;
+      font-family: sans-serif;
+      font-size: 14px;
+      white-space: pre-wrap; /* Para mantener saltos de línea */
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
 <body>
   <h1>Download Transcript</h1>
-  <button id="downloadBtn">Download</button>
+  <button id="downloadBtn">Download</button><br>
+  <a id="url"></a>
+  <div id="summary"></div>
+  <div id="error-message" class="error" style="display:none;"></div>
   <script src="popup.js"></script>
 </body>
 </html>

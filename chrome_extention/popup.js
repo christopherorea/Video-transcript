@@ -1,13 +1,75 @@
+document.addEventListener('DOMContentLoaded', async () => {
+    const summaryDiv = document.getElementById('summary');
+    const urlDiv = document.getElementById('url');
+
+    chrome.storage.sync.get(['summary', 'url']).then(result => {
+        if (result.summary) {
+            summaryDiv.textContent = result.summary;
+            urlDiv.href = result.url;
+            urlDiv.textContent = result.url;
+        }
+    });
+});
+
 document.getElementById('downloadBtn').addEventListener('click', async () => {
+
+  const summaryDiv = document.getElementById('summary');
+  const urlDiv = document.getElementById('url');
+
+  summaryDiv.textContent = 'Cargando...'; // Mensaje de carga
+  urlDiv.textContent = ''; // Limpiar la URL anterior
+  const errorMessageDiv = document.getElementById('error-message');
+  let apiKey = null;  // Inicializa la variable apiKey
+
+  if (chrome.storage.sync.get(['apiKey'], (result) => {
+    if (result.apiKey) {  // Si la clave API ya está almacenada, no hacemos nada
+      apiKey = result.apiKey;
+    } else {
+      // Si no hay clave API almacenada, solicitamos al usuario que la ingrese
+      apiKey = prompt("Por favor, ingresa tu clave API de Gemini:");  // Cambia el mensaje según sea necesario   
+      if (apiKey) {
+        chrome.storage.sync.set({ apiKey: apiKey }, () => {
+          console.log("API key saved:", apiKey);
+        });
+      } else {
+        alert("No se proporcionó ninguna clave API. La transcripción no se descargará.");
+        return;
+      }
+    }
+  }));
+
+  // Función para mostrar mensajes de error
+  function displayError(message) {
+    errorMessageDiv.textContent = message;
+    errorMessageDiv.style.display = 'block';
+    summaryDiv.textContent = ''; // Limpiar cualquier resumen anterior
+  }
+
   const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
-    func: downloadTranscript
+    func: downloadTranscript,
+    args: [apiKey]
+  }, (injectionResults)=> {
+    if (chrome.runtime.lastError) {
+          displayError(`Error al inyectar script: ${chrome.runtime.lastError.message}`);
+          return;
+        }
+      if (injectionResults && injectionResults[0] && injectionResults[0].result) {
+        const { summary, url } = injectionResults[0].result;
+        summaryDiv.textContent = summary;
+        urlDiv.href = result.url;
+        urlDiv.textContent = result.url;
+
+        chrome.storage.sync.set({ summary: summary, url: url }, () => {
+          console.log("Summary and URL saved:");
+        });
+      }
   });
 });
 
 
-async function downloadTranscript() {
+async function downloadTranscript(apiKey) {
 
   async function waitForSelector(selector, timeout = 10000) {
     return new Promise((resolve, reject) => {
@@ -47,14 +109,39 @@ async function downloadTranscript() {
 
     const url = window.location.href;
     const filename = `${url.split('=')[1] || 'transcript'}.txt`; // Maneja casos donde no hay ID de video
-    const text = url + "\n\n" + content.join('\n\n').replace(/,?[0-9]+:[0-9][0-9]/g, "").replace(/^\s*\n/gm, "");
+    const text = content.join('\n\n').replace(/,?[0-9]+:[0-9][0-9]/g, "").replace(/^\s*\n/gm, "");
 
-    // Descarga el archivo
+    // Resume el texto usando la API de Gemini
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Genera un resumen de la siguiente transcripción de YouTube:\n\n" + text,
+              }
+            ]
+          }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    const summary = data.candidates[0].content.parts[0].text;
+
+    //Descarga el archivo de texto
     const a = document.createElement('a');
-    const file = new Blob([text], { type: 'text/plain' });
+    const file = new Blob([data.candidates[0].content.parts[0].text], { type: 'text/plain' });
     a.href = URL.createObjectURL(file);
     a.download = filename;
     a.click();
+
+    return {summary: summary, url: url}; // Devuelve el resumen y la URL
 
 
   } catch (error) {

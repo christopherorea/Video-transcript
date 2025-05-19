@@ -8,7 +8,7 @@ eachLine('video.txt', (url, _)=> {
     // Launch the browser and open a new blank page
     const browser = await launch({ 
       headless: true, 
-      executablePath: '/usr/bin/chromium-browser' 
+      executablePath: './chrome/win64-131.0.6778.85/chrome-win64/chrome' 
     });
     const page = await browser.newPage();
   
@@ -21,18 +21,19 @@ eachLine('video.txt', (url, _)=> {
   
     // Opens button for options
     console.log('Opens options');
+    await page.screenshot({ path: './screenshots/display_video.png' });
     const options = '#button-shape > button > yt-touch-feedback-shape > div > div.yt-spec-touch-feedback-shape__fill';
-    await page.waitForSelector(options, { timeout: 10000 });
+    await page.waitForSelector(options, { timeout: 20000 });
     await page.click(options);
   
-    /* Opens transcript option
-    //await page.screenshot({ path: 'check_for_transcript.png' })
+    //Opens transcript option
+    await page.screenshot({ path: './screenshots/check_for_transcript.png' })
     console.log('Opens transcript option');
-    //await page.screenshot({ path: 'transcript_option.png' });
+    await page.screenshot({ path: './screenshots/transcript_option.png' });
     const show = '#items > ytd-menu-service-item-renderer';
     await page.waitForSelector(show, { timeout: 10000 });
     await page.click(show);
-    */
+    
   
     // Opens transcript text
     console.log('Activates transcript text');
@@ -56,7 +57,7 @@ eachLine('video.txt', (url, _)=> {
     //await page.screenshot({ path: 'show_transcript.png' });
   
     // Create a file
-    writeFile(`${url.split('=')[1]}.txt`, url + "\n\n" + content.toString().replace(/,?[0-9]+:[0-9][0-9]/g, "").replace(/^\s*\n/gm, ""), (err) => {
+    writeFile(`./output/${url.split('=')[1]}.txt`, url + "\n\n" + content.toString().replace(/,?[0-9]+:[0-9][0-9]/g, "").replace(/^\s*\n/gm, ""), (err) => {
       if (err) throw err;
     });
   
